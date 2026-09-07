@@ -1,7 +1,10 @@
 import prisma from "@/lib/prisma";
+import ApplicationForm from "./_components/ApplicationForm";
 
 export default async function ApplicationsPage() {
+
   const applications = await prisma.application.findMany();
+
   return (
     <main className="flex w-full flex-col items-center gap-5">
       <h1 className="text-3xl font-bold">Applications</h1>
@@ -29,6 +32,7 @@ export default async function ApplicationsPage() {
           No Applications Yet.
           </div>}
       </section>
+        <ApplicationForm />
     </main>
   );
 }
