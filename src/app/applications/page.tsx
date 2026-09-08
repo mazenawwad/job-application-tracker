@@ -2,9 +2,15 @@ import prisma from "@/lib/prisma";
 import ApplicationForm from "./_components/ApplicationForm";
 import ApplicationStatus from "./_components/ApplicationStatus";
 import DeleteApplication from "./_components/DeleteApplication";
+import { currentUserId } from "@/lib/current-user";
 
 export default async function ApplicationsPage() {
-  const applications = await prisma.application.findMany();
+  const applications = await prisma.application
+  .findMany({
+    where: {
+      userId : currentUserId
+    }
+  });
 
   return (
     <main className="flex w-full flex-col items-center gap-5">

@@ -1,6 +1,7 @@
 "use server";
 
 import { Prisma } from "@/generated/prisma/client";
+import { currentUserId } from "@/lib/current-user";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import z from "zod";
@@ -55,9 +56,11 @@ export async function createApplication(
       errors: errors.fieldErrors,
     };
   }
-
   await prisma.application.create({
-    data: result.data,
+    data: {
+      ...result.data,
+      userId: currentUserId,
+    },
   });
   revalidatePath("/applications");
   return {
@@ -74,6 +77,7 @@ export type StatusFormState = {
   errors: {
     id?: string[];
     status?: string[];
+    general?: string[];
   };
   success: boolean;
 };
@@ -96,20 +100,42 @@ export async function updateApplicationStatus(
       success: false,
     };
   }
-  await prisma.application.update({
-    where: {
-      id: result.data.id,
-    },
-    data: {
-      status: result.data.status,
-    },
-  });
-  revalidatePath("/applications");
+  try {
+    await prisma.application.update({
+      where: {
+        id: result.data.id,
+        userId: currentUserId,
+      },
+      data: {
+        status: result.data.status,
+      },
+    });
+    revalidatePath("/applications");
 
-  return {
-    errors: {},
-    success: true,
-  };
+    return {
+      errors: {},
+      success: true,
+    };
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2025"
+    ) {
+      return {
+        errors: {
+          general: ["Application could not be found."],
+        },
+        success: false,
+      };
+    }
+    console.error(error);
+    return {
+      errors: {
+        general: ["Something went wrong while updating the application."],
+      },
+      success: false,
+    };
+  }
 }
 
 export type ApplicationDeleteFormState = {
@@ -149,6 +175,7 @@ export async function deleteApplication(
     await prisma.application.delete({
       where: {
         id: result.data.id,
+        userId: currentUserId
       },
     });
     revalidatePath("/applications");
@@ -168,6 +195,7 @@ export async function deleteApplication(
         success: false,
       };
     }
+    console.error(error);
     return {
       errors: {
         general: ["Something went wrong while deleting the application."],

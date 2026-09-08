@@ -20,6 +20,10 @@ const ApplicationStatus = ({ status, id }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const errorMessage =
+    state.errors.status?.[0] ??
+    state.errors.general?.[0];
+
   useEffect(() => {
     if (!state.success) return;
     setIsEditing(false);
@@ -33,12 +37,16 @@ const ApplicationStatus = ({ status, id }: Props) => {
 
   return !isEditing ? (
     <div className="flex justify-between w-full">
-      {isSuccess && 
-      <p className="bg-green-700 text-white px-5 rounded-2xl flex items-center"> Success!</p>
-      }
+      {isSuccess && (
+        <p className="bg-green-700 text-white px-5 rounded-2xl flex items-center">
+          {" "}
+          Success!
+        </p>
+      )}
       <div>
         <strong>Status: </strong>
-        {status}</div>
+        {status}
+      </div>
       <button
         className="px-2 py-1 rounded-full bg-blue-700 text-white"
         onClick={() => setIsEditing(!isEditing)}
@@ -77,11 +85,8 @@ const ApplicationStatus = ({ status, id }: Props) => {
           </button>
         </div>
       </div>
-      {state.errors.status && (
-        <p className="text-red-700 bg-white px-5 rounded-2xl">
-          {" "}
-          {state.errors.status[0]}
-        </p>
+      {errorMessage && (
+        <p className="rounded-2xl bg-white px-5 text-red-700">{errorMessage}</p>
       )}
     </form>
   );
