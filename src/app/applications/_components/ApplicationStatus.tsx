@@ -36,7 +36,9 @@ const ApplicationStatus = ({ status, id }: Props) => {
       {isSuccess && 
       <p className="bg-green-700 text-white px-5 rounded-2xl flex items-center"> Success!</p>
       }
-      <div>{status}</div>
+      <div>
+        <strong>Status: </strong>
+        {status}</div>
       <button
         className="px-2 py-1 rounded-full bg-blue-700 text-white"
         onClick={() => setIsEditing(!isEditing)}

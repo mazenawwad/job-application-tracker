@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@/generated/prisma/client";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import z from "zod";
@@ -24,7 +25,7 @@ const applicationSchema = z.object({
   ),
 });
 
-export type FormState = {
+export type ApplicationFormState = {
   errors: {
     company?: string[];
     position?: string[];
@@ -34,9 +35,9 @@ export type FormState = {
   };
 };
 export async function createApplication(
-  _previousState: FormState,
+  _previousState: ApplicationFormState,
   formData: FormData,
-): Promise<FormState> {
+): Promise<ApplicationFormState> {
   const rawData = {
     company: formData.get("company"),
     position: formData.get("position"),
@@ -64,10 +65,6 @@ export async function createApplication(
   };
 }
 
-
-
-
-
 const statusUpdateSchema = z.object({
   id: z.coerce.number().positive().int(),
   status: z.string().min(3, { error: "Please enter a valid status." }),
@@ -77,8 +74,8 @@ export type StatusFormState = {
   errors: {
     id?: string[];
     status?: string[];
-  },
-  success: boolean
+  };
+  success: boolean;
 };
 
 export async function updateApplicationStatus(
@@ -96,7 +93,7 @@ export async function updateApplicationStatus(
     const errors = z.flattenError(result.error);
     return {
       errors: errors.fieldErrors,
-      success: false
+      success: false,
     };
   }
   await prisma.application.update({
@@ -111,6 +108,71 @@ export async function updateApplicationStatus(
 
   return {
     errors: {},
-    success: true
+    success: true,
   };
+}
+
+export type ApplicationDeleteFormState = {
+  errors: {
+    id?: string[];
+    general?: string[];
+  };
+  success: boolean;
+};
+
+const invalidIdMessage = "This isn't a valid ID.";
+const applicationDeleteSchema = z.object({
+  id: z
+    .number({ error: invalidIdMessage })
+    .positive({ error: invalidIdMessage })
+    .int({ error: invalidIdMessage }),
+});
+
+export async function deleteApplication(
+  applicationId: number,
+): Promise<ApplicationDeleteFormState> {
+  const rawData = {
+    id: applicationId,
+  };
+  const result = applicationDeleteSchema.safeParse(rawData);
+
+  if (!result.success) {
+    const errors = z.flattenError(result.error);
+    return {
+      errors: {
+        id: errors.fieldErrors.id,
+      },
+      success: false,
+    };
+  }
+  try {
+    await prisma.application.delete({
+      where: {
+        id: result.data.id,
+      },
+    });
+    revalidatePath("/applications");
+    return {
+      errors: {},
+      success: true,
+    };
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2025"
+    ) {
+      return {
+        errors: {
+          general: ["Application could not be found."],
+        },
+        success: false,
+      };
+    }
+    return {
+      errors: {
+        general: ["Something went wrong while deleting the application."],
+      },
+      success: false,
+    };
+  }
 }

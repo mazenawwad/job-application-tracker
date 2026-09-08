@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import ApplicationForm from "./_components/ApplicationForm";
 import ApplicationStatus from "./_components/ApplicationStatus";
+import DeleteApplication from "./_components/DeleteApplication";
 
 export default async function ApplicationsPage() {
   const applications = await prisma.application.findMany();
@@ -27,6 +28,9 @@ export default async function ApplicationsPage() {
                 id={application.id}
                 status={application.status}
               />
+              <div className="flex justify-end gap-3">
+                <DeleteApplication id={application.id} />
+              </div>
             </article>
           ))
         ) : (
