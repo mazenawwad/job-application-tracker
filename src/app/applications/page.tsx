@@ -3,6 +3,7 @@ import ApplicationForm from "./_components/ApplicationForm";
 import ApplicationStatus from "./_components/ApplicationStatus";
 import DeleteApplication from "./_components/DeleteApplication";
 import { currentUserId } from "@/lib/current-user";
+import { auth } from "../../../auth";
 
 export default async function ApplicationsPage() {
   const applications = await prisma.application
@@ -11,7 +12,8 @@ export default async function ApplicationsPage() {
       userId : currentUserId
     }
   });
-
+  const session = await auth();
+  console.log(session);  
   return (
     <main className="flex w-full flex-col items-center gap-5">
       <h1 className="text-3xl font-bold">Applications</h1>
