@@ -1,10 +1,10 @@
 "use server";
 
 import { Prisma } from "@/generated/prisma/client";
-import { currentUserId } from "@/lib/current-user";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import z from "zod";
+import { auth } from "../../../auth";
 
 const applicationSchema = z.object({
   company: z
@@ -33,12 +33,21 @@ export type ApplicationFormState = {
     status?: string[];
     jobUrl?: string[];
     notes?: string[];
+    general?: string[];
   };
 };
 export async function createApplication(
   _previousState: ApplicationFormState,
   formData: FormData,
 ): Promise<ApplicationFormState> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return {
+      errors: {
+        general: ["You must be logged in to create an application."],
+      },
+    };
+  }
   const rawData = {
     company: formData.get("company"),
     position: formData.get("position"),
@@ -56,12 +65,23 @@ export async function createApplication(
       errors: errors.fieldErrors,
     };
   }
-  await prisma.application.create({
-    data: {
-      ...result.data,
-      userId: currentUserId,
-    },
-  });
+  const currentUserId = Number(session.user.id);
+  try {
+    await prisma.application.create({
+      data: {
+        ...result.data,
+        userId: currentUserId,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    return {
+      errors: {
+        general: ["Something went wrong while creating the application."],
+      },
+    };
+  }
   revalidatePath("/applications");
   return {
     errors: {},
@@ -86,6 +106,15 @@ export async function updateApplicationStatus(
   _previousState: StatusFormState,
   formData: FormData,
 ): Promise<StatusFormState> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return {
+      errors: {
+        general: ["You must be logged in to update this application."],
+      },
+      success: false,
+    };
+  }
   const rawData = {
     id: formData.get("id"),
     status: formData.get("status"),
@@ -100,6 +129,8 @@ export async function updateApplicationStatus(
       success: false,
     };
   }
+  const currentUserId = Number(session.user.id);
+
   try {
     await prisma.application.update({
       where: {
@@ -157,6 +188,15 @@ const applicationDeleteSchema = z.object({
 export async function deleteApplication(
   applicationId: number,
 ): Promise<ApplicationDeleteFormState> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return {
+      errors: {
+        general: ["You must be logged in to delete an application."],
+      },
+      success: false,
+    };
+  }
   const rawData = {
     id: applicationId,
   };
@@ -171,11 +211,13 @@ export async function deleteApplication(
       success: false,
     };
   }
+  const currentUserId = Number(session.user.id);
+
   try {
     await prisma.application.delete({
       where: {
         id: result.data.id,
-        userId: currentUserId
+        userId: currentUserId,
       },
     });
     revalidatePath("/applications");

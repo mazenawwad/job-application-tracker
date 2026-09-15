@@ -20,16 +20,21 @@ const ApplicationForm = () => {
         action={formAction}
         className="flex w-full max-w-2xl flex-col items-center gap-5"
       >
+        {state.errors.general && (
+          <p className="text-red-700 bg-white px-5 rounded-2xl">
+            {state.errors.general[0]}
+          </p>
+        )}
         <input
           className="w-full bg-gray-300 text-2xl text-black placeholder:text-black px-5 py-1 rounded-md"
           name="company"
           placeholder="What is the company name?"
-        />
-        {state.errors.company && (
-          <p className="text-red-700 bg-white px-5 rounded-2xl">
-            {state.errors.company[0]}
-          </p>
-        )}
+          />
+          {state.errors.company && (
+            <p className="text-red-700 bg-white px-5 rounded-2xl">
+              {state.errors.company[0]}
+            </p>
+          )}
         <input
           className="w-full bg-gray-300 text-2xl text-black placeholder:text-black px-5 py-1 rounded-md"
           name="position"

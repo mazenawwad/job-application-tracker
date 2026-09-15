@@ -1,19 +1,21 @@
 import prisma from "@/lib/prisma";
+import { auth } from "../../../auth";
 import ApplicationForm from "./_components/ApplicationForm";
 import ApplicationStatus from "./_components/ApplicationStatus";
 import DeleteApplication from "./_components/DeleteApplication";
-import { currentUserId } from "@/lib/current-user";
-import { auth } from "../../../auth";
+import { redirect } from "next/navigation";
 
 export default async function ApplicationsPage() {
-  const applications = await prisma.application
-  .findMany({
-    where: {
-      userId : currentUserId
-    }
-  });
   const session = await auth();
-  console.log(session);  
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+  const currentUserId = Number(session.user.id);
+  const applications = await prisma.application.findMany({
+    where: {
+      userId: currentUserId,
+    },
+  });
   return (
     <main className="flex w-full flex-col items-center gap-5">
       <h1 className="text-3xl font-bold">Applications</h1>
