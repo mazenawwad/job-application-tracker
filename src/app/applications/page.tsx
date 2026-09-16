@@ -5,6 +5,7 @@ import ApplicationStatus from "./_components/ApplicationStatus";
 import DeleteApplication from "./_components/DeleteApplication";
 import { redirect } from "next/navigation";
 import LogoutButton from "./_components/LogoutButton";
+import Link from "next/link";
 
 export default async function ApplicationsPage() {
   const session = await auth();
@@ -30,6 +31,7 @@ export default async function ApplicationsPage() {
               key={application.id}
               className="flex flex-col gap-2 rounded-2xl  bg-white p-5 text-black"
             >
+              <Link className="px-2 py-1 rounded-full w-fit bg-green-700 text-white" href={`/applications/${application.id}`}>View details</Link>
               <p>
                 <strong>Applied to:</strong> {application.company}
               </p>
