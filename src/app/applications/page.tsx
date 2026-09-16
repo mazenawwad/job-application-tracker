@@ -4,6 +4,7 @@ import ApplicationForm from "./_components/ApplicationForm";
 import ApplicationStatus from "./_components/ApplicationStatus";
 import DeleteApplication from "./_components/DeleteApplication";
 import { redirect } from "next/navigation";
+import LogoutButton from "./_components/LogoutButton";
 
 export default async function ApplicationsPage() {
   const session = await auth();
@@ -18,8 +19,10 @@ export default async function ApplicationsPage() {
   });
   return (
     <main className="flex w-full flex-col items-center gap-5">
-      <h1 className="text-3xl font-bold">Applications</h1>
-
+      <div className="flex justify-between">
+        <h1 className="text-3xl font-bold">Applications</h1>
+        <LogoutButton />
+      </div>
       <section className="flex w-full max-w-2xl flex-col gap-5">
         {applications.length > 0 ? (
           applications.map((application) => (
