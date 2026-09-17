@@ -1,12 +1,12 @@
 import { notFound, redirect } from "next/navigation";
-import { auth } from "../../../../auth";
+import { auth } from "../../../../../auth";
 import prisma from "@/lib/prisma";
 import z from "zod";
-import Link from "next/link";
+import EditApplicationForm from "./_components/EditApplicationForm";
 
 const applicationIdSchema = z.coerce.number().int().positive();
 
-export default async function ApplicationDetailsPage({
+export default async function EditApplicationPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -19,8 +19,9 @@ export default async function ApplicationDetailsPage({
   const { id } = await params;
   const applicationId = applicationIdSchema.safeParse(id);
   if (!applicationId.success) {
-    return notFound();
+    notFound();
   }
+
   const application = await prisma.application.findUnique({
     where: {
       id: applicationId.data,
@@ -31,14 +32,17 @@ export default async function ApplicationDetailsPage({
     notFound();
   }
   return (
-    <div className="flex flex-col items-center justify-start gap-3 max-w-2xl">
-      <Link href={`/applications/${application.id}/edit`}>Edit</Link>
-      <p>{application.company}</p>
-      <p>{application.position}</p>
-      <p>{application.status}</p>
-      <p>{application.jobUrl}</p>
-      <p>{application.notes}</p>
-      <p>{application.createdAt.toLocaleDateString()}</p>
+    <div>
+      <h1>Edit {application.company}</h1>
+      <EditApplicationForm
+        company={application.company}
+        id={application.id}
+        jobUrl={application.jobUrl}
+        notes={application.notes}
+        position={application.position}
+        status={application.status}
+        key={application.id}
+      />
     </div>
   );
 }
