@@ -7,18 +7,42 @@ import { redirect } from "next/navigation";
 import LogoutButton from "./_components/LogoutButton";
 import Link from "next/link";
 import { applicationStatuses } from "@/lib/application-status";
+import { sortOptions } from "@/lib/sort-option";
+import { Prisma } from "@/generated/prisma/client";
 
 export default async function ApplicationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    status?: string;
+    sort?: string;
+  }>;
 }) {
-  const { q, status } = await searchParams;
+  const { q, status, sort } = await searchParams;
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/login");
   }
 
+let orderBy: Prisma.ApplicationOrderByWithRelationInput | undefined;
+  switch (sort) {
+    case "newest":
+      orderBy = { createdAt: "desc" };
+      break;
+
+    case "oldest":
+      orderBy = { createdAt: "asc" };
+      break;
+
+    case "company-asc":
+      orderBy = { company: "asc" };
+      break;
+
+    case "company-desc":
+      orderBy = { company: "desc" };
+      break;
+  }
   const currentUserId = Number(session.user.id);
   const applications = await prisma.application.findMany({
     where: {
@@ -35,6 +59,7 @@ export default async function ApplicationsPage({
       }),
       ...(status && { status }),
     },
+    orderBy,
   });
   return (
     <main className="flex w-full flex-col items-center gap-5">
@@ -52,8 +77,26 @@ export default async function ApplicationsPage({
           <select name="status" defaultValue={status ?? ""}>
             <option value="">All Statuses</option>
             {applicationStatuses.map((applicationStatus) => (
-              <option className="text-black active:text-red-900" key={applicationStatus} value={applicationStatus}>
+              <option
+                className="text-black active:text-red-900"
+                key={applicationStatus}
+                value={applicationStatus}
+              >
                 {applicationStatus}
+              </option>
+            ))}
+          </select>
+          <select name="sort" defaultValue={sort ?? ""}>
+            <option value="" disabled hidden>
+              Sort by:
+            </option>
+            {sortOptions.map((sortOption) => (
+              <option
+                key={sortOption.value}
+                value={sortOption.value}
+                className="text-black active:text-red-900"
+              >
+                {sortOption.label}
               </option>
             ))}
           </select>
