@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { createApplication } from "../action";
 import type { ApplicationFormState } from "../action";
+import { applicationStatuses } from "@/lib/application-status";
 
 const ApplicationForm = () => {
   const initialState: ApplicationFormState = {
@@ -45,11 +46,13 @@ const ApplicationForm = () => {
             {state.errors.position[0]}
           </p>
         )}
-        <input
-          className="w-full bg-gray-300 text-2xl text-black placeholder:text-black px-5 py-1 rounded-md"
-          name="status"
-          placeholder="What is the application status?"
-        />
+          <select name="status" defaultValue={applicationStatuses[0]}>
+            {applicationStatuses.map((applicationStatus) => (
+              <option className="text-black active:text-red-900" key={applicationStatus} value={applicationStatus}>
+                {applicationStatus}
+              </option>
+            ))}
+          </select>
         {state.errors.status && (
           <p className="text-red-700 bg-white px-5 rounded-2xl">
             {state.errors.status[0]}

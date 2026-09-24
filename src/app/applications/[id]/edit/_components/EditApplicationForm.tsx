@@ -1,6 +1,7 @@
 "use client";
 import { useActionState, useEffect, useState } from "react";
 import { updateApplication, type EditApplicationFormState } from "../action";
+import { applicationStatuses } from "@/lib/application-status";
 
 type Props = {
   id: number;
@@ -55,7 +56,13 @@ export default function EditApplicationForm(prop: Props) {
           {state.errors.position[0]}
         </p>
       )}
-      <input name="status" defaultValue={prop.status} />
+      <select name="status" defaultValue={prop.status}>
+        {applicationStatuses.map((applicationStatus) => (
+          <option key={applicationStatus} value={applicationStatus}>
+            {applicationStatus}
+          </option>
+        ))}
+      </select>{" "}
       {state.errors.status && (
         <p className="text-red-700 bg-white px-5 rounded-2xl">
           {state.errors.status[0]}

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { revalidatePath } from "next/cache";
+import { applicationStatuses } from "@/lib/application-status";
 
 export type EditApplicationFormState = {
   errors: {
@@ -28,7 +29,7 @@ const editApplicationSchema = z.object({
     .string()
     .min(3, { error: "Please enter a valid position." })
     .max(40),
-  status: z.string().min(3, { error: "Please enter a valid status." }),
+  status: z.enum(applicationStatuses, { error: "Please select a valid status." }),
   jobUrl: z.preprocess(
     (value) => (value === "" ? null : value),
     z.url({ error: "Kindly enter a valid URL." }).nullable(),

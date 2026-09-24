@@ -6,16 +6,34 @@ import DeleteApplication from "./_components/DeleteApplication";
 import { redirect } from "next/navigation";
 import LogoutButton from "./_components/LogoutButton";
 import Link from "next/link";
+import { applicationStatuses } from "@/lib/application-status";
 
-export default async function ApplicationsPage() {
+export default async function ApplicationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string }>;
+}) {
+  const { q, status } = await searchParams;
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/login");
   }
+
   const currentUserId = Number(session.user.id);
   const applications = await prisma.application.findMany({
     where: {
       userId: currentUserId,
+      ...(q && {
+        OR: [
+          {
+            position: { contains: q, mode: "insensitive" },
+          },
+          {
+            company: { contains: q, mode: "insensitive" },
+          },
+        ],
+      }),
+      ...(status && { status }),
     },
   });
   return (
@@ -25,13 +43,34 @@ export default async function ApplicationsPage() {
         <LogoutButton />
       </div>
       <section className="flex w-full max-w-2xl flex-col gap-5">
+        <form>
+          <input
+            name="q"
+            placeholder="Search Applications..."
+            defaultValue={q}
+          />
+          <select name="status" defaultValue={status ?? ""}>
+            <option value="">All Statuses</option>
+            {applicationStatuses.map((applicationStatus) => (
+              <option className="text-black active:text-red-900" key={applicationStatus} value={applicationStatus}>
+                {applicationStatus}
+              </option>
+            ))}
+          </select>
+          <button type="submit"> Search</button>
+        </form>
         {applications.length > 0 ? (
           applications.map((application) => (
             <article
               key={application.id}
               className="flex flex-col gap-2 rounded-2xl  bg-white p-5 text-black"
             >
-              <Link className="px-2 py-1 rounded-full w-fit bg-green-700 text-white" href={`/applications/${application.id}`}>View details</Link>
+              <Link
+                className="px-2 py-1 rounded-full w-fit bg-green-700 text-white"
+                href={`/applications/${application.id}`}
+              >
+                View details
+              </Link>
               <p>
                 <strong>Applied to:</strong> {application.company}
               </p>

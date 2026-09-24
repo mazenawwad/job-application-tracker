@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { updateApplicationStatus } from "../action";
 import type { StatusFormState } from "../action";
+import { applicationStatuses } from "@/lib/application-status";
 
 type Props = {
   id: number;
@@ -20,9 +21,7 @@ const ApplicationStatus = ({ status, id }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const errorMessage =
-    state.errors.status?.[0] ??
-    state.errors.general?.[0];
+  const errorMessage = state.errors.status?.[0] ?? state.errors.general?.[0];
 
   useEffect(() => {
     if (!state.success) return;
@@ -59,13 +58,17 @@ const ApplicationStatus = ({ status, id }: Props) => {
     <form action={formAction}>
       <div className="flex flex-col items-center gap-3">
         <input type="hidden" name="id" value={id} />
-        <input
-          type="text"
-          className="w-full bg-gray-300 text-2xl text-black placeholder:text-black px-5 py-1 rounded-md"
-          name="status"
-          placeholder="What is the new status?"
-          defaultValue={status}
-        />
+        <select name="status" defaultValue={status}>
+          {applicationStatuses.map((applicationStatus) => (
+            <option
+              className="text-black active:text-red-900"
+              key={applicationStatus}
+              value={applicationStatus}
+            >
+              {applicationStatus}
+            </option>
+          ))}
+        </select>
         <div className="flex justify-between w-full">
           <button
             className="px-2 py-1 rounded-full bg-gray-700 text-white"

@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import z from "zod";
 import { auth } from "../../../auth";
+import { applicationStatuses } from "@/lib/application-status";
 
 const applicationSchema = z.object({
   company: z
@@ -15,7 +16,9 @@ const applicationSchema = z.object({
     .string()
     .min(3, { error: "Please enter a valid position." })
     .max(40),
-  status: z.string().min(3, { error: "Please enter a valid status." }),
+  status: z.enum(applicationStatuses, {
+    error: "Please select a valid status.",
+  }),
   jobUrl: z.preprocess(
     (value) => (value === "" ? null : value),
     z.url({ error: "Kindly enter a valid URL." }).nullable(),
@@ -90,7 +93,9 @@ export async function createApplication(
 
 const statusUpdateSchema = z.object({
   id: z.coerce.number().positive().int(),
-  status: z.string().min(3, { error: "Please enter a valid status." }),
+  status: z.enum(applicationStatuses, {
+    error: "Please select a valid status.",
+  }),
 });
 
 export type StatusFormState = {
@@ -142,6 +147,8 @@ export async function updateApplicationStatus(
       },
     });
     revalidatePath("/applications");
+    revalidatePath(`/applications/${result.data.id}`);
+    revalidatePath(`/applications/${result.data.id}/edit`);
 
     return {
       errors: {},
