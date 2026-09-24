@@ -9,6 +9,7 @@ import Link from "next/link";
 import { applicationStatuses } from "@/lib/application-status";
 import { sortOptions } from "@/lib/sort-option";
 import { Prisma } from "@/generated/prisma/client";
+import z from "zod";
 
 export default async function ApplicationsPage({
   searchParams,
@@ -17,15 +18,66 @@ export default async function ApplicationsPage({
     q?: string;
     status?: string;
     sort?: string;
+    page?: string;
   }>;
 }) {
-  const { q, status, sort } = await searchParams;
+  const { q, status, sort, page } = await searchParams;
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/login");
   }
+  const currentUserId = Number(session.user.id);
 
-let orderBy: Prisma.ApplicationOrderByWithRelationInput | undefined;
+  const where: Prisma.ApplicationWhereInput = {
+    userId: currentUserId,
+    ...(q && {
+      OR: [
+        {
+          position: { contains: q, mode: "insensitive" },
+        },
+        {
+          company: { contains: q, mode: "insensitive" },
+        },
+      ],
+    }),
+    ...(status && { status }),
+  };
+
+  function createPageUrl(pageNumber: number) {
+    const params = new URLSearchParams();
+
+    if (q) {
+      params.set("q", q);
+    }
+    if (status) {
+      params.set("status", status);
+    }
+    if (sort) {
+      params.set("sort", sort);
+    }
+    params.set("page", String(pageNumber));
+    return `/applications?${params.toString()}`;
+  }
+
+  const totalApplications = await prisma.application.count({
+    where,
+  });
+
+  const pageSize = 5;
+  const totalPageCount = Math.max(Math.ceil(totalApplications / pageSize), 1);
+
+  const pageNumber = z.coerce.number().int().positive().safeParse(page);
+  let currentPage = pageNumber.success ? pageNumber.data : 1;
+
+  if (currentPage > totalPageCount) {
+    currentPage = totalPageCount;
+  }
+  const hasPreviousPage = currentPage > 1;
+  const hasNextPage = currentPage < totalPageCount;
+
+  const skipNumber = (currentPage - 1) * pageSize;
+
+  let orderBy: Prisma.ApplicationOrderByWithRelationInput | undefined;
   switch (sort) {
     case "newest":
       orderBy = { createdAt: "desc" };
@@ -43,23 +95,11 @@ let orderBy: Prisma.ApplicationOrderByWithRelationInput | undefined;
       orderBy = { company: "desc" };
       break;
   }
-  const currentUserId = Number(session.user.id);
   const applications = await prisma.application.findMany({
-    where: {
-      userId: currentUserId,
-      ...(q && {
-        OR: [
-          {
-            position: { contains: q, mode: "insensitive" },
-          },
-          {
-            company: { contains: q, mode: "insensitive" },
-          },
-        ],
-      }),
-      ...(status && { status }),
-    },
+    where,
     orderBy,
+    skip: skipNumber,
+    take: pageSize,
   });
   return (
     <main className="flex w-full flex-col items-center gap-5">
@@ -68,6 +108,15 @@ let orderBy: Prisma.ApplicationOrderByWithRelationInput | undefined;
         <LogoutButton />
       </div>
       <section className="flex w-full max-w-2xl flex-col gap-5">
+        <div className="flex justify-between w-full">
+          {hasPreviousPage && (
+            <Link href={createPageUrl(currentPage - 1)}>Previous</Link>
+          )}
+          <span>
+            Page {currentPage} of {totalPageCount}
+          </span>
+          {hasNextPage && <Link href={createPageUrl(currentPage + 1)}>Next</Link>}
+        </div>
         <form>
           <input
             name="q"
