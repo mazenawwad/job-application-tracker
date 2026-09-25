@@ -59,12 +59,39 @@ export default async function ApplicationsPage({
     return `/applications?${params.toString()}`;
   }
 
-  const totalApplications = await prisma.application.count({
+  const totalMatchingApplications = await prisma.application.count({
     where,
   });
 
+  const totalUserApplications = await prisma.application.count({
+    where: {
+      userId: currentUserId,
+    },
+  });
+
+  const applicationsByStatus = await prisma.application.groupBy({
+    by: ["status"],
+    where: {
+      userId: currentUserId,
+    },
+    _count: {
+      id: true,
+    },
+  });
+  const statusCounts = applicationStatuses.map((status) => {
+    const matchingGroup = applicationsByStatus.find(
+      (group) => group.status === status,
+    );
+    return {
+      status,
+      count: matchingGroup?._count.id ?? 0
+    }
+  });
   const pageSize = 5;
-  const totalPageCount = Math.max(Math.ceil(totalApplications / pageSize), 1);
+  const totalPageCount = Math.max(
+    Math.ceil(totalMatchingApplications / pageSize),
+    1,
+  );
 
   const pageNumber = z.coerce.number().int().positive().safeParse(page);
   let currentPage = pageNumber.success ? pageNumber.data : 1;
@@ -104,9 +131,17 @@ export default async function ApplicationsPage({
   return (
     <main className="flex w-full flex-col items-center gap-5">
       <div className="flex justify-between">
-        <h1 className="text-3xl font-bold">Applications</h1>
+        <h1 className="text-3xl font-bold">
+          Applications: {totalUserApplications}
+        </h1>
         <LogoutButton />
       </div>
+      {statusCounts.map((statusCount)=>(
+        <div key={statusCount.status}>
+          <span>{statusCount.status}: </span>
+          <span>{statusCount.count}</span>
+        </div>
+      ))}
       <section className="flex w-full max-w-2xl flex-col gap-5">
         <div className="flex justify-between w-full">
           {hasPreviousPage && (
@@ -115,7 +150,9 @@ export default async function ApplicationsPage({
           <span>
             Page {currentPage} of {totalPageCount}
           </span>
-          {hasNextPage && <Link href={createPageUrl(currentPage + 1)}>Next</Link>}
+          {hasNextPage && (
+            <Link href={createPageUrl(currentPage + 1)}>Next</Link>
+          )}
         </div>
         <form>
           <input
