@@ -84,8 +84,8 @@ export default async function ApplicationsPage({
     );
     return {
       status,
-      count: matchingGroup?._count.id ?? 0
-    }
+      count: matchingGroup?._count.id ?? 0,
+    };
   });
   const pageSize = 5;
   const totalPageCount = Math.max(
@@ -136,12 +136,17 @@ export default async function ApplicationsPage({
         </h1>
         <LogoutButton />
       </div>
-      {statusCounts.map((statusCount)=>(
-        <div key={statusCount.status}>
-          <span>{statusCount.status}: </span>
-          <span>{statusCount.count}</span>
-        </div>
-      ))}
+      <section className="lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-5 flex flex-col">
+        {statusCounts.map((statusCount) => (
+          <div
+            className="bg-white text-black border rounded-lg flex flex-col gap-3 p-6"
+            key={statusCount.status}
+          >
+            <span className="text-xl">{statusCount.status}</span>
+            <span className="font-bold text-2xl">{statusCount.count}</span>
+          </div>
+        ))}
+      </section>
       <section className="flex w-full max-w-2xl flex-col gap-5">
         <div className="flex justify-between w-full">
           {hasPreviousPage && (
