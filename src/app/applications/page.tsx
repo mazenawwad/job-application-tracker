@@ -10,6 +10,9 @@ import { applicationStatuses } from "@/lib/application-status";
 import { sortOptions } from "@/lib/sort-option";
 import { Prisma } from "@/generated/prisma/client";
 import z from "zod";
+import ApplicationStatistics from "./_components/ApplicationStatistics";
+import { Suspense } from "react";
+import ApplicationStatisticsSkeleton from "./_components/ApplicationStatisticsSkeleton";
 
 export default async function ApplicationsPage({
   searchParams,
@@ -69,24 +72,6 @@ export default async function ApplicationsPage({
     },
   });
 
-  const applicationsByStatus = await prisma.application.groupBy({
-    by: ["status"],
-    where: {
-      userId: currentUserId,
-    },
-    _count: {
-      id: true,
-    },
-  });
-  const statusCounts = applicationStatuses.map((status) => {
-    const matchingGroup = applicationsByStatus.find(
-      (group) => group.status === status,
-    );
-    return {
-      status,
-      count: matchingGroup?._count.id ?? 0,
-    };
-  });
   const pageSize = 5;
   const totalPageCount = Math.max(
     Math.ceil(totalMatchingApplications / pageSize),
@@ -136,17 +121,9 @@ export default async function ApplicationsPage({
         </h1>
         <LogoutButton />
       </div>
-      <section className="lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-5 flex flex-col">
-        {statusCounts.map((statusCount) => (
-          <div
-            className="bg-white text-black border rounded-lg flex flex-col gap-3 p-6"
-            key={statusCount.status}
-          >
-            <span className="text-xl">{statusCount.status}</span>
-            <span className="font-bold text-2xl">{statusCount.count}</span>
-          </div>
-        ))}
-      </section>
+      <Suspense fallback={<ApplicationStatisticsSkeleton />}>
+        <ApplicationStatistics currentUserId={currentUserId} />
+      </Suspense>
       <section className="flex w-full max-w-2xl flex-col gap-5">
         <div className="flex justify-between w-full">
           {hasPreviousPage && (
