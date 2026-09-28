@@ -13,6 +13,7 @@ import z from "zod";
 import ApplicationStatistics from "./_components/ApplicationStatistics";
 import { Suspense } from "react";
 import ApplicationStatisticsSkeleton from "./_components/ApplicationStatisticsSkeleton";
+import { getCurrentPage } from "@/lib/pagination/pagination";
 
 export default async function ApplicationsPage({
   searchParams,
@@ -78,12 +79,7 @@ export default async function ApplicationsPage({
     1,
   );
 
-  const pageNumber = z.coerce.number().int().positive().safeParse(page);
-  let currentPage = pageNumber.success ? pageNumber.data : 1;
-
-  if (currentPage > totalPageCount) {
-    currentPage = totalPageCount;
-  }
+  const currentPage = getCurrentPage(page, totalPageCount)
   const hasPreviousPage = currentPage > 1;
   const hasNextPage = currentPage < totalPageCount;
 
