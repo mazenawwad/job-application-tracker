@@ -32,7 +32,8 @@ export default async function ApplicationDetailsPage({
   }
   return (
     <div className="flex flex-col items-center justify-start gap-3 max-w-2xl">
-      <Link href={`/applications/${application.id}/edit`}>Edit</Link>
+      <label htmlFor="edit" className="sr-only">Edit</label>
+      <Link id="edit" href={`/applications/${application.id}/edit`}>Edit</Link>
       <p>{application.company}</p>
       <p>{application.position}</p>
       <p>{application.status}</p>

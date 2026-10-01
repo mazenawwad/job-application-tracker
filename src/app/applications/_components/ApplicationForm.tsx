@@ -26,17 +26,25 @@ const ApplicationForm = () => {
             {state.errors.general[0]}
           </p>
         )}
+        <label htmlFor="company" className="sr-only">
+          Company
+        </label>
         <input
+          id="company"
           className="w-full bg-gray-300 text-2xl text-black placeholder:text-black px-5 py-1 rounded-md"
           name="company"
           placeholder="What is the company name?"
-          />
-          {state.errors.company && (
-            <p className="text-red-700 bg-white px-5 rounded-2xl">
-              {state.errors.company[0]}
-            </p>
-          )}
+        />
+        {state.errors.company && (
+          <p className="text-red-700 bg-white px-5 rounded-2xl">
+            {state.errors.company[0]}
+          </p>
+        )}
+        <label htmlFor="position" className="sr-only">
+          Position
+        </label>
         <input
+          id="position"
           className="w-full bg-gray-300 text-2xl text-black placeholder:text-black px-5 py-1 rounded-md"
           name="position"
           placeholder="What is the position?"
@@ -46,19 +54,30 @@ const ApplicationForm = () => {
             {state.errors.position[0]}
           </p>
         )}
-          <select name="status" defaultValue={applicationStatuses[0]}>
-            {applicationStatuses.map((applicationStatus) => (
-              <option className="text-black active:text-red-900" key={applicationStatus} value={applicationStatus}>
-                {applicationStatus}
-              </option>
-            ))}
-          </select>
+        <label htmlFor="status" className="sr-only">
+          Status
+        </label>
+        <select id="status" name="status" defaultValue={applicationStatuses[0]}>
+          {applicationStatuses.map((applicationStatus) => (
+            <option
+              className="text-black active:text-red-900"
+              key={applicationStatus}
+              value={applicationStatus}
+            >
+              {applicationStatus}
+            </option>
+          ))}
+        </select>
         {state.errors.status && (
           <p className="text-red-700 bg-white px-5 rounded-2xl">
             {state.errors.status[0]}
           </p>
         )}
+        <label htmlFor="jobUrl" className="sr-only">
+          JobUrl
+        </label>
         <input
+          id="jobUrl"
           className="w-full bg-gray-300 text-2xl text-black placeholder:text-black px-5 py-1 rounded-md"
           name="jobUrl"
           placeholder="Enter the job URL, if available."
@@ -68,7 +87,11 @@ const ApplicationForm = () => {
             {state.errors.jobUrl[0]}
           </p>
         )}
+        <label htmlFor="notes" className="sr-only">
+          Notes
+        </label>
         <textarea
+          id="notes"
           className="w-full bg-gray-300 text-2xl text-black placeholder:text-black px-5 py-1 rounded-md"
           name="notes"
           placeholder="Do you have any notes?"

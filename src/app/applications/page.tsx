@@ -79,7 +79,7 @@ export default async function ApplicationsPage({
     1,
   );
 
-  const currentPage = getCurrentPage(page, totalPageCount)
+  const currentPage = getCurrentPage(page, totalPageCount);
   const hasPreviousPage = currentPage > 1;
   const hasNextPage = currentPage < totalPageCount;
 
@@ -133,12 +133,15 @@ export default async function ApplicationsPage({
           )}
         </div>
         <form>
+          <label htmlFor="search" className="sr-only">Search</label>
           <input
+            id="search"
             name="q"
             placeholder="Search Applications..."
             defaultValue={q}
           />
-          <select name="status" defaultValue={status ?? ""}>
+          <label htmlFor="statusFilter" className="sr-only">StatusFilter</label>
+          <select id="statusFilter" name="status" defaultValue={status ?? ""}>
             <option value="">All Statuses</option>
             {applicationStatuses.map((applicationStatus) => (
               <option
@@ -150,7 +153,8 @@ export default async function ApplicationsPage({
               </option>
             ))}
           </select>
-          <select name="sort" defaultValue={sort ?? ""}>
+          <label htmlFor="sorting" className="sr-only">Sorting</label>
+          <select id="sorting" name="sort" defaultValue={sort ?? ""}>
             <option value="" disabled hidden>
               Sort by:
             </option>
@@ -172,7 +176,11 @@ export default async function ApplicationsPage({
               key={application.id}
               className="flex flex-col gap-2 rounded-2xl  bg-white p-5 text-black"
             >
+              <label htmlFor="viewDetails" className="sr-only">
+                View Details
+              </label>
               <Link
+                id="viewDetails"
                 className="px-2 py-1 rounded-full w-fit bg-green-700 text-white"
                 href={`/applications/${application.id}`}
               >

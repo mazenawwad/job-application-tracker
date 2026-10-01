@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useActionState } from "react";
 import { login } from "../action";
@@ -18,13 +18,21 @@ const LoginForm = () => {
         className="gap-5 py-10 flex mt-30 flex-col items-center justify-center rounded-md"
         action={formAction}
       >
+        <label htmlFor="email" className="sr-only">
+          Email
+        </label>
         <input
+          id="email"
           type="email"
           name="email"
           placeholder="johndoe@mail.com"
           className="bg-white px-30 py-3 placeholder:italic text-black/90"
         />
+        <label htmlFor="password" className="sr-only">
+          Password
+        </label>
         <input
+          id="password"
           type="password"
           name="password"
           className="bg-white px-30 py-3 placeholder:italic text-black/90"
@@ -37,12 +45,12 @@ const LoginForm = () => {
         >
           {isPending ? "Logging in..." : "Log in"}
         </button>
-      {errorMessage && (
-        <p className="text-red-700 bg-white px-5 rounded-2xl">
-          {" "}
-          {errorMessage}
-        </p>
-      )}
+        {errorMessage && (
+          <p className="text-red-700 bg-white px-5 rounded-2xl">
+            {" "}
+            {errorMessage}
+          </p>
+        )}
       </form>
     </div>
   );
