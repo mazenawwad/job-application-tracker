@@ -10,7 +10,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/job_tracker_test
-    
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
     services:
       postgres:
         image: postgres:17
@@ -45,7 +45,7 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
-        
+
       - name: Apply database migrations
         run: npx prisma migrate deploy
 
