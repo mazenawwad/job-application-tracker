@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test:e2e": "dotenv -e .env.e2e -- playwright test",
+    "test:e2e:local": "dotenv -e .env.e2e -- playwright test",
+    "test:e2e": "playwright test",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest"
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

@@ -22,7 +22,7 @@ import globalSetuo from './e2e/global-setup';
     /* Retry on CI only */
     retries: process.env.CI ? 2 : 0,
     /* Opt out of parallel tests on CI. */
-    workers: ,
+    workers: 4,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
     reporter: 'html',
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -74,7 +74,7 @@ import globalSetuo from './e2e/global-setup';
 
     /* Run your local dev server before starting the tests */
     webServer: {
-      command: 'dotenv -e .env.e2e -- npm run dev',
+      command: 'npm run dev',
       url: 'http://localhost:3000',
       reuseExistingServer: false,
     },
