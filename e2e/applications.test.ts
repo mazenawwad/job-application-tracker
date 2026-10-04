@@ -71,7 +71,11 @@ test("deletes an application successfully", async ({ page }) => {
     .getByRole("article")
     .filter({ hasText: application.company });
   await applicationCard.getByRole("button", { name: "Delete" }).click();
-  await applicationCard.getByRole("button", { name: "Confirm Delete" }).click();
-  await page.reload();
+  const confirmDeleteButton = applicationCard.getByRole("button", {
+    name: "Confirm Delete",
+  });
+  await confirmDeleteButton.click();
+  await page.getByLabel("Search").fill(`C ${id}`);
+  await page.getByRole("button", { name: "Search" }).click();
   await expect(applicationCard).toHaveCount(0);
 });
