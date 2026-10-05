@@ -140,7 +140,7 @@ export default async function ApplicationsPage({
             placeholder="Search Applications..."
             defaultValue={q}
           />
-          <label htmlFor="statusFilter" className="sr-only">StatusFilter</label>
+          <label htmlFor="statusFilter" className="sr-only">Status Filter</label>
           <select id="statusFilter" name="status" defaultValue={status ?? ""}>
             <option value="">All Statuses</option>
             {applicationStatuses.map((applicationStatus) => (

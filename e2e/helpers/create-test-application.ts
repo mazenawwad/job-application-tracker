@@ -34,7 +34,7 @@ export async function createTestApplication({
   await page
     .getByLabel("Status", { exact: true })
     .selectOption(application.status);
-  await page.getByLabel("JobUrl").fill(application.jobUrl);
+  await page.getByLabel("Job Url").fill(application.jobUrl);
   await page.getByLabel("Notes").fill(application.notes);
   await page.getByRole("button", { name: "Create Application" }).click();
 

@@ -6,9 +6,9 @@ import z from "zod";
 
 const credentialsSchema = z.object({
   email: z.email(),
-  password: z
+  password: z 
     .string()
-    .min(5, { error: "Password should be at least 5 characters long." }),
+    .min(8),
 });
 
 export const { handlers, signIn, signOut, auth } = NextAuth({

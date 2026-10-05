@@ -3,20 +3,16 @@ import bcrypt from "bcryptjs";
 
 async function resetE2EDatabase() {
   try {
-    const result = await prisma.application.deleteMany();
+    const applicationResult = await prisma.application.deleteMany();
+    const userResult = await prisma.user.deleteMany();
 
-    console.log(`Deleted ${result.count} applications`);
+    console.log(`Deleted ${applicationResult.count} applications`);
+    console.log(`Deleted ${userResult.count} users`);
 
     const passwordHash = await bcrypt.hash("testpass", 12);
 
-    await prisma.user.upsert({
-      where: {
-        email: "test@test.com",
-      },
-      update: {
-        passwordHash,
-      },
-      create: {
+    await prisma.user.create({
+      data: {
         email: "test@test.com",
         passwordHash,
       },

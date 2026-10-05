@@ -110,7 +110,7 @@ test("status filter only returns matching applications", async ({ page }) => {
   });
 
   await page.getByLabel("Search").fill(id);
-  await page.getByLabel("StatusFilter").selectOption(firstApplication.status);
+  await page.getByLabel("Status Filter").selectOption(firstApplication.status);
   await page.getByRole("button", { name: "Search" }).click();
 
   const firstApplicationCard = page
@@ -151,7 +151,7 @@ test("search and status filter work together", async ({ page }) => {
   });
 
   await page.getByLabel("Search").fill(id);
-  await page.getByLabel("StatusFilter").selectOption(applicationStatuses[0]);
+  await page.getByLabel("Status Filter").selectOption(applicationStatuses[0]);
 
   await page.getByRole("button", { name: "Search" }).click();
 

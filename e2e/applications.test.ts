@@ -10,7 +10,7 @@ test("creates an application and it appears in the ui", async ({ page }) => {
   await page.getByLabel("Company").fill(`C ${randomUUID}`);
   await page.getByLabel("Position").fill(`P ${randomUUID}`);
   await page
-    .getByLabel("JobUrl")
+    .getByLabel("Job Url")
     .fill(`https://example.com/jobs/${randomUUID}`);
   await page.getByLabel("Notes").fill(`Notes ${randomUUID}`);
   await page.getByRole("button", { name: "Create Application" }).click();
@@ -43,7 +43,7 @@ test("edits an application successfully.", async ({ page }) => {
   await page.getByLabel("Company").fill(updatedApplication.company);
   await page.getByLabel("Position").fill(updatedApplication.position);
   await page.getByLabel("Status").selectOption("In Process");
-  await page.getByLabel("JobUrl").fill(updatedApplication.jobUrl);
+  await page.getByLabel("Job Url").fill(updatedApplication.jobUrl);
   await page.getByLabel("Notes").fill(updatedApplication.notes);
 
   await page.getByRole("button", { name: "Edit Application" }).click();
@@ -57,7 +57,7 @@ test("edits an application successfully.", async ({ page }) => {
     updatedApplication.position,
   );
   await expect(page.getByLabel("Status")).toHaveValue("In Process");
-  await expect(page.getByLabel("JobUrl")).toHaveValue(
+  await expect(page.getByLabel("Job Url")).toHaveValue(
     updatedApplication.jobUrl,
   );
   await expect(page.getByLabel("Notes")).toHaveValue(updatedApplication.notes);

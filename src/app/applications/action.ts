@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import z from "zod";
 import { auth } from "../../../auth";
 import { applicationStatuses } from "@/lib/application-status";
-import { applicationSchema } from "@/lib/validations/application";
+import { applicationSchema } from "@/lib/validations/applications/application";
 
 
 

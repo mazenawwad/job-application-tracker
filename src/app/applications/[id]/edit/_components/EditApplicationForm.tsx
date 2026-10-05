@@ -77,7 +77,7 @@ export default function EditApplicationForm(prop: Props) {
         </p>
       )}
       <label htmlFor="jobUrl" className="sr-only">
-        JobUrl
+        Job Url
       </label>
       <input id="jobUrl" name="jobUrl" defaultValue={prop.jobUrl ?? ""} />
       {state.errors.jobUrl && (

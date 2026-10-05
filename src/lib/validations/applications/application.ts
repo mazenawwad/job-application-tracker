@@ -1,5 +1,5 @@
 import z from "zod";
-import { applicationStatuses } from "../application-status";
+import { applicationStatuses } from "../../application-status";
 
 export const applicationSchema = z.object({
   company: z

@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { login } from "../action";
 import type { LoginState } from "../action";
+import Link from "next/link";
 
 const initialState: LoginState = {
   errors: {},
@@ -13,7 +14,7 @@ const LoginForm = () => {
   const errorMessage =
     state.errors.credentials?.[0] ?? state.errors.general?.[0];
   return (
-    <div>
+    <div className="flex justify-center flex-col items-center">
       <form
         className="gap-5 py-10 flex mt-30 flex-col items-center justify-center rounded-md"
         action={formAction}
@@ -52,6 +53,12 @@ const LoginForm = () => {
           </p>
         )}
       </form>
+      <p>
+        No Account? Sign up{" "}
+        <Link className="underline text-blue-500" href={"/signup"}>
+          here
+        </Link>
+      </p>
     </div>
   );
 };

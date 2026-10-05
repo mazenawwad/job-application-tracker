@@ -74,7 +74,7 @@ const ApplicationForm = () => {
           </p>
         )}
         <label htmlFor="jobUrl" className="sr-only">
-          JobUrl
+          Job Url
         </label>
         <input
           id="jobUrl"
