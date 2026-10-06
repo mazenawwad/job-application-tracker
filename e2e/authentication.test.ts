@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { nanoid } from "nanoid";
+import { login } from "./helpers/login";
 
 test("redirects unauthenticated users to login", async ({ page }) => {
   await page.goto("/applications");
@@ -77,3 +78,21 @@ test("prevents duplicate emails", async ({ page }) => {
   await expect(page.getByText("This email is already taken.")).toBeVisible();
   await expect(page).toHaveURL("/signup");
 });
+
+test("redirects authenticated users away from auth and root pages", async ({page})=>{
+  await login(page);
+
+  await page.goto("/signup")
+  await expect(page).toHaveURL("/applications")
+
+  await page.goto("/login")
+  await expect(page).toHaveURL("/applications")
+
+  await page.goto("/")
+  await expect(page).toHaveURL("/applications")
+})
+
+test("takes unauthenticated users to login page", async ({page})=>{
+  await page.goto("/")
+  await expect(page).toHaveURL("/login");
+})
